@@ -23,10 +23,12 @@ namespace SkImageResizer
 
             sw.Start();
             imageProcess.ResizeImages(sourcePath, destinationPath1, 2.0);
+            //await Task.Delay(500);
             sw.Stop();
 
+            //decimal result1 = 12_000;//sw.ElapsedMilliseconds;
             decimal result1 = sw.ElapsedMilliseconds;
-            Console.WriteLine($"同步執行花費時間: {result1} ms");
+            Console.WriteLine($"同步執行花費時間: {result1/1000:#,0.00} 秒");
 
             // Async
 
@@ -50,7 +52,7 @@ namespace SkImageResizer
             sw.Stop();
 
             decimal result2 = sw.ElapsedMilliseconds;
-            Console.WriteLine($"非同步的花費時間: {result2} ms");
+            Console.WriteLine($"非同步的花費時間: {result2 / 1000:#,0.00} 秒");
 
             // Result
             // 效能提升比例公式：((Orig - New) / Orig) * 100%
