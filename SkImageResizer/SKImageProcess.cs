@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -77,8 +78,6 @@ namespace SkImageResizer
                         using var s = File.OpenWrite(Path.Combine(destPath, imgName + ".jpg"));
                         data.SaveTo(s);
                     });
-
-                    //Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId} | {imgName} => {(Environment.TickCount - tick) /1000f:#,0.00} 秒");
                 }));
             }
 
@@ -113,23 +112,40 @@ namespace SkImageResizer
         /// <returns></returns>
         public List<string> FindImages(string srcPath)
         {
-            List<string> files = new List<string>();
-            files.AddRange(Directory.GetFiles(srcPath, "*.png", SearchOption.AllDirectories));
-            files.AddRange(Directory.GetFiles(srcPath, "*.jpg", SearchOption.AllDirectories));
-            files.AddRange(Directory.GetFiles(srcPath, "*.jpeg", SearchOption.AllDirectories));
-            return files;
+            var exts = new string[] { ".png", ".jpg", ".jpeg" };
+            //List<string> files = new List<string>();
+            //var times = MeasureTimeSpend(() =>
+            //{
+            //    files.AddRange(Directory.GetFiles(srcPath, "*.png", SearchOption.AllDirectories));
+            //    files.AddRange(Directory.GetFiles(srcPath, "*.jpg", SearchOption.AllDirectories));
+            //    files.AddRange(Directory.GetFiles(srcPath, "*.jpeg", SearchOption.AllDirectories));
+            //});
+            //Console.WriteLine($"1. {times:#,0.00} ms");
+
+            //files.Clear();
+            //times = MeasureTimeSpend(() =>
+            //{
+            //    files = Directory.EnumerateFiles(srcPath, "*.*", SearchOption.AllDirectories)
+            //                     .Where(file => exts.Any(x => file.EndsWith(x, StringComparison.OrdinalIgnoreCase)))
+            //                     .ToList();
+            //});
+            //Console.WriteLine($"2. {times:#,0.00} ms");
+
+            //return files;
+
+            return Directory.EnumerateFiles(srcPath, "*.*", SearchOption.AllDirectories)
+                            .Where(file => exts.Any(x => file.EndsWith(x, StringComparison.OrdinalIgnoreCase)))
+                            .ToList();
         }
 
-        /// <summary>
-        /// 找出指定目錄下的圖片
-        /// </summary>
-        /// <param name="srcPath">圖片來源目錄路徑</param>
-        /// <returns></returns>
-        public IEnumerable<string> FindImages2(string srcPath)
+        private double MeasureTimeSpend(Action func)
         {
-            var exts = new string[] { "*.png", "*.jpg", "*.jpeg" };
-            return Directory.EnumerateFiles(srcPath, "*.*")
-                            .Where(file => exts.Any(x => file.EndsWith(x, StringComparison.OrdinalIgnoreCase)));
+            if (func == null) { return -1d; }
+            var sw = new Stopwatch();
+            sw.Start();
+            func.Invoke();
+            sw.Stop();
+            return sw.Elapsed.TotalMilliseconds;
         }
     }
 }

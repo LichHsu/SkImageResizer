@@ -18,24 +18,28 @@ namespace SkImageResizer
             var destinationPath2 = Path.Combine(Environment.CurrentDirectory, "output2");
 
             // Sync
-
+            Console.WriteLine($"同步壓縮 => 清空舊檔案.");
             imageProcess.Clean(destinationPath1);
 
+            Console.WriteLine($"同步壓縮 => 開始.");
             sw.Start();
             imageProcess.ResizeImages(sourcePath, destinationPath1, 2.0);
-            //await Task.Delay(500);
             sw.Stop();
 
             //decimal result1 = 12_000;//sw.ElapsedMilliseconds;
-            decimal result1 = sw.ElapsedMilliseconds;
-            Console.WriteLine($"同步執行花費時間: {result1/1000:#,0.00} 秒");
+            var result1 = sw.Elapsed.TotalMilliseconds;
+            Console.WriteLine($"同步壓縮 => 結束 (耗時 {result1 / 1000:#,0.00} 秒).");
+
+            Console.WriteLine("");
+            Console.WriteLine("========");
+            Console.WriteLine("");
 
             // Async
-
+            Console.WriteLine($"非同步壓縮 => 清空舊檔案.");
             imageProcess.Clean(destinationPath2);
 
+            Console.WriteLine($"非同步壓縮 => 開始.");
             sw.Restart();
-
             try
             {
                 await imageProcess.ResizeImagesAsync(sourcePath, destinationPath2, 2.0);
@@ -48,17 +52,15 @@ namespace SkImageResizer
             {
                 Console.WriteLine($"Exception:{ex}");
             }
-
             sw.Stop();
 
-            decimal result2 = sw.ElapsedMilliseconds;
-            Console.WriteLine($"非同步的花費時間: {result2 / 1000:#,0.00} 秒");
+            var result2 = sw.Elapsed.TotalMilliseconds;
+            Console.WriteLine($"非同步壓縮 => 結束 (耗時 {result2 / 1000:#,0.00} 秒).");
 
             // Result
             // 效能提升比例公式：((Orig - New) / Orig) * 100%
-
             var result = ((result1 - result2) / result1) * 100;
-            Console.WriteLine($"效能提升 {result:f2}%");
+            Console.WriteLine($"效能提升 => {result:f2}%");
         }
     }
 }
