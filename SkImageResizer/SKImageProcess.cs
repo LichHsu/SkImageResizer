@@ -48,12 +48,7 @@ namespace SkImageResizer
             }
         }
 
-        public async Task<Task> ResizeImagesAsync(string sourcePath, string destPath, double scale)
-        {
-            return ResizeImagesAsync(sourcePath, destPath, scale);
-        }
-
-        public Task ResizeImagesAsync(string sourcePath, string destPath, double scale, CancellationToken token = default)
+        public Task ResizeImagesAsync(string sourcePath, string destPath, double scale, IProgress<string> progress, CancellationToken token = default)
         {
             if (!Directory.Exists(destPath)) { Directory.CreateDirectory(destPath); }
 
@@ -61,7 +56,7 @@ namespace SkImageResizer
             var allFiles = FindImages(sourcePath);
             foreach (var filePath in allFiles)
             {
-                ls.Add(Task.Run(() =>
+                ls.Add(Task.Run(async () =>
                 {
                     if (token.IsCancellationRequested)
                     {
@@ -78,8 +73,7 @@ namespace SkImageResizer
                     var destinationWidth = (int)(sourceWidth * scale);
                     var destinationHeight = (int)(sourceHeight * scale);
 
-
-                    Task.Run(() =>
+                    await Task.Run(() =>
                     {
                         if (token.IsCancellationRequested)
                         {
@@ -94,9 +88,8 @@ namespace SkImageResizer
                         using var s = File.OpenWrite(Path.Combine(destPath, imgName + ".jpg"));
                         data.SaveTo(s);
 
-                        Console.WriteLine(imgName);
+                        progress.Report(imgName);
                     });
-
                 }));
             }
 

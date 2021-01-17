@@ -13,6 +13,11 @@ namespace SkImageResizer
 
         static async Task Main(string[] args)
         {
+            Progress<string> progress = new Progress<string>((msg) =>
+            {
+                Console.WriteLine(msg);
+            });
+
             Console.CancelKeyPress += Console_CancelKeyPress;
 
             var imageProcess = new SKImageProcess();
@@ -20,22 +25,22 @@ namespace SkImageResizer
             var destinationPath1 = Path.Combine(Environment.CurrentDirectory, "output1");
             var destinationPath2 = Path.Combine(Environment.CurrentDirectory, "output2");
 
-            //// Sync
-            //Console.WriteLine($"同步壓縮 => 清空舊檔案.");
-            //imageProcess.Clean(destinationPath1);
+            // Sync
+            Console.WriteLine($"同步壓縮 => 清空舊檔案.");
+            imageProcess.Clean(destinationPath1);
 
-            //Console.WriteLine($"同步壓縮 => 開始.");
-            //sw.Start();
-            //imageProcess.ResizeImages(sourcePath, destinationPath1, 2.0);
-            //sw.Stop();
+            Console.WriteLine($"同步壓縮 => 開始.");
+            sw.Start();
+            imageProcess.ResizeImages(sourcePath, destinationPath1, 2.0);
+            sw.Stop();
 
-            ////decimal result1 = 12_000;//sw.ElapsedMilliseconds;
-            //var result1 = sw.Elapsed.TotalMilliseconds;
-            //Console.WriteLine($"同步壓縮 => 結束 (耗時 {result1 / 1000:#,0.00} 秒).");
+            //decimal result1 = 12_000;//sw.ElapsedMilliseconds;
+            var result1 = sw.Elapsed.TotalMilliseconds;
+            Console.WriteLine($"同步壓縮 => 結束 (耗時 {result1 / 1000:#,0.00} 秒).");
 
-            //Console.WriteLine("");
-            //Console.WriteLine("========");
-            //Console.WriteLine("");
+            Console.WriteLine("");
+            Console.WriteLine("========");
+            Console.WriteLine("");
 
             // Async
             Console.WriteLine($"非同步壓縮 => 清空舊檔案.");
@@ -45,17 +50,14 @@ namespace SkImageResizer
             sw.Restart();
             try
             {
-                await imageProcess.ResizeImagesAsync(sourcePath, destinationPath2, 2.0, cts.Token);
-                if (cts.IsCancellationRequested)
-                {
-                    Console.WriteLine($"作業取消 => 清空舊檔案.");
-                    imageProcess.Clean(destinationPath2);
-                    Console.WriteLine($"清空舊檔案 => 完成.");
-                }
+                await imageProcess.ResizeImagesAsync(sourcePath, destinationPath2, 2.0, progress, cts.Token);
             }
             catch (OperationCanceledException ex)
             {
                 Console.WriteLine($"Canceled: {ex}");
+                Console.WriteLine($"作業取消 => 清空舊檔案.");
+                imageProcess.Clean(destinationPath2);
+                Console.WriteLine($"清空舊檔案 => 完成.");
             }
             catch (Exception ex)
             {
