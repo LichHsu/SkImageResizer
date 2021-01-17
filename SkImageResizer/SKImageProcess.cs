@@ -48,7 +48,12 @@ namespace SkImageResizer
             }
         }
 
-        public async Task ResizeImagesAsync(string sourcePath, string destPath, double scale)
+        public async Task<Task> ResizeImagesAsync(string sourcePath, string destPath, double scale)
+        {
+            return ResizeImagesAsync(sourcePath, destPath, scale);
+        }
+
+        public Task ResizeImagesAsync(string sourcePath, string destPath, double scale, CancellationToken token = default)
         {
             if (!Directory.Exists(destPath)) { Directory.CreateDirectory(destPath); }
 
@@ -68,8 +73,18 @@ namespace SkImageResizer
                     var destinationWidth = (int)(sourceWidth * scale);
                     var destinationHeight = (int)(sourceHeight * scale);
 
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     Task.Run(() =>
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
                         using var scaledBitmap = bitmap.Resize(
                             new SKImageInfo(destinationWidth, destinationHeight),
                             SKFilterQuality.High);
@@ -78,11 +93,13 @@ namespace SkImageResizer
                         using var s = File.OpenWrite(Path.Combine(destPath, imgName + ".jpg"));
                         data.SaveTo(s);
                     });
+
                 }));
             }
 
-            await Task.WhenAll(ls);
+            return Task.WhenAll(ls);
         }
+
 
         /// <summary>
         /// 清空目的目錄下的所有檔案與目錄
