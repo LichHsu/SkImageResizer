@@ -63,6 +63,11 @@ namespace SkImageResizer
             {
                 ls.Add(Task.Run(() =>
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     var bitmap = SKBitmap.Decode(filePath);
                     var imgPhoto = SKImage.FromBitmap(bitmap);
                     var imgName = Path.GetFileNameWithoutExtension(filePath);
@@ -73,10 +78,6 @@ namespace SkImageResizer
                     var destinationWidth = (int)(sourceWidth * scale);
                     var destinationHeight = (int)(sourceHeight * scale);
 
-                    if (token.IsCancellationRequested)
-                    {
-                        return;
-                    }
 
                     Task.Run(() =>
                     {
