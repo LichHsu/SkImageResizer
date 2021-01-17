@@ -92,6 +92,8 @@ namespace SkImageResizer
                         using var data = scaledImage.Encode(SKEncodedImageFormat.Jpeg, 100);
                         using var s = File.OpenWrite(Path.Combine(destPath, imgName + ".jpg"));
                         data.SaveTo(s);
+
+                        Console.WriteLine(imgName);
                     });
 
                 }));

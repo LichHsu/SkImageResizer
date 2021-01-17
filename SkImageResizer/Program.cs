@@ -20,22 +20,22 @@ namespace SkImageResizer
             var destinationPath1 = Path.Combine(Environment.CurrentDirectory, "output1");
             var destinationPath2 = Path.Combine(Environment.CurrentDirectory, "output2");
 
-            // Sync
-            Console.WriteLine($"同步壓縮 => 清空舊檔案.");
-            imageProcess.Clean(destinationPath1);
+            //// Sync
+            //Console.WriteLine($"同步壓縮 => 清空舊檔案.");
+            //imageProcess.Clean(destinationPath1);
 
-            Console.WriteLine($"同步壓縮 => 開始.");
-            sw.Start();
-            imageProcess.ResizeImages(sourcePath, destinationPath1, 2.0);
-            sw.Stop();
+            //Console.WriteLine($"同步壓縮 => 開始.");
+            //sw.Start();
+            //imageProcess.ResizeImages(sourcePath, destinationPath1, 2.0);
+            //sw.Stop();
 
-            //decimal result1 = 12_000;//sw.ElapsedMilliseconds;
-            var result1 = sw.Elapsed.TotalMilliseconds;
-            Console.WriteLine($"同步壓縮 => 結束 (耗時 {result1 / 1000:#,0.00} 秒).");
+            ////decimal result1 = 12_000;//sw.ElapsedMilliseconds;
+            //var result1 = sw.Elapsed.TotalMilliseconds;
+            //Console.WriteLine($"同步壓縮 => 結束 (耗時 {result1 / 1000:#,0.00} 秒).");
 
-            Console.WriteLine("");
-            Console.WriteLine("========");
-            Console.WriteLine("");
+            //Console.WriteLine("");
+            //Console.WriteLine("========");
+            //Console.WriteLine("");
 
             // Async
             Console.WriteLine($"非同步壓縮 => 清空舊檔案.");
